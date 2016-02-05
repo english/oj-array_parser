@@ -5,11 +5,14 @@ module Oj
     class ParserError < StandardError
     end
 
-    def self.enumerator(string_or_io)
+    # @param [String, IO] string_or_io json to parse
+    # @param [Hash] options parsing options to pass to Oj, see http://www.ohler.com/oj/#label-Options
+    # @return [Enumerator] yields parsed top-level entries in the read json document
+    def self.enumerator(string_or_io, options = {})
       Enumerator.new do |yielder|
         parser = new { |value| yielder << value }
 
-        Oj.sc_parse(parser, string_or_io)
+        Oj.sc_parse(parser, string_or_io, options)
       end
     end
 

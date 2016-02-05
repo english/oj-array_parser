@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'bigdecimal'
 
 class Oj::ArrayParserTest < Minitest::Test
   def test_that_it_has_a_version_number
@@ -12,7 +13,7 @@ class Oj::ArrayParserTest < Minitest::Test
           "foo": ["bar"]
         },
         "baz",
-        "quux"
+        0.001
       ]
     JSON
   end
@@ -30,7 +31,7 @@ class Oj::ArrayParserTest < Minitest::Test
 
     assert_equal({ "foo" => [ "bar" ] }, values[0])
     assert_equal "baz", values[1]
-    assert_equal "quux", values[2]
+    assert_equal 0.001, values[2]
   end
 
   def test_enumerator
@@ -41,5 +42,13 @@ class Oj::ArrayParserTest < Minitest::Test
     assert_equal 2, slices.count
     assert_equal 2, slices[0].count
     assert_equal 1, slices[1].count
+  end
+
+  def test_enumerator_options
+    enumerator = Oj::ArrayParser.enumerator(@json)
+    assert_equal Float, enumerator.to_a.last.class
+
+    enumerator = Oj::ArrayParser.enumerator(@json, bigdecimal_load: :bigdecimal)
+    assert_equal BigDecimal, enumerator.to_a.last.class
   end
 end
